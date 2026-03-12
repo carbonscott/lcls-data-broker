@@ -31,6 +31,25 @@ def to_json_safe(value):
     return value
 
 
+def _load_artifact_info(base_dir, file_path, dataset_path, _cache={}):
+    """Load and cache shape + dtype for a dataset path.
+
+    Tries HDF5 first, falls back to Zarr.
+    """
+    if dataset_path not in _cache:
+        full_path = os.path.join(base_dir, file_path)
+        try:
+            with h5py.File(full_path, "r") as f:
+                ds = f[dataset_path]
+                _cache[dataset_path] = (ds.shape, ds.dtype)
+        except Exception:
+            import zarr
+            store = zarr.open(full_path, mode="r")
+            arr = store[dataset_path]
+            _cache[dataset_path] = (arr.shape, arr.dtype)
+    return _cache[dataset_path]
+
+
 def get_artifact_shape(base_dir, file_path, dataset_path, index=None, _cache={}):
     """Read artifact shape from HDF5 or Zarr, with caching by dataset path.
 
@@ -38,19 +57,16 @@ def get_artifact_shape(base_dir, file_path, dataset_path, index=None, _cache={})
     that share the same internal structure. Tries HDF5 first, falls
     back to Zarr if that fails.
     """
-    if dataset_path not in _cache:
-        full_path = os.path.join(base_dir, file_path)
-        try:
-            with h5py.File(full_path, "r") as f:
-                _cache[dataset_path] = f[dataset_path].shape
-        except Exception:
-            import zarr
-            store = zarr.open(full_path, mode="r")
-            _cache[dataset_path] = store[dataset_path].shape
-    full_shape = _cache[dataset_path]
+    full_shape, _ = _load_artifact_info(base_dir, file_path, dataset_path)
     if index is not None:
         return list(full_shape[1:])  # Skip batch dimension
     return list(full_shape)
+
+
+def get_artifact_dtype(base_dir, file_path, dataset_path):
+    """Read artifact dtype from HDF5 or Zarr, with caching by dataset path."""
+    _, dtype = _load_artifact_info(base_dir, file_path, dataset_path)
+    return dtype
 
 
 def check_server():

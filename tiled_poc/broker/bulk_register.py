@@ -76,6 +76,7 @@ from .utils import (
     make_artifact_key,
     to_json_safe,
     get_artifact_shape,
+    get_artifact_dtype,
     ARTIFACT_STANDARD_COLS,
 )
 
@@ -226,16 +227,19 @@ def prepare_node_data(ent_df, art_df, max_entities, base_dir=None):
                 if "index" in art_row.index and pd.notna(art_row.get("index")):
                     index = int(art_row["index"])
 
-                # Get shape from HDF5 (cached by dataset path)
+                # Get shape and dtype (cached by dataset path)
                 data_shape = get_artifact_shape(
                     base_dir, h5_rel_path, dataset_path, index
+                )
+                data_dtype = get_artifact_dtype(
+                    base_dir, h5_rel_path, dataset_path
                 )
 
                 # Build artifact metadata dynamically from non-standard columns
                 art_metadata = {
                     "type": art_row["type"],
                     "shape": data_shape,
-                    "dtype": "float64",
+                    "dtype": str(data_dtype),
                 }
                 for col in art_df.columns:
                     if col not in ARTIFACT_STANDARD_COLS:
@@ -245,9 +249,9 @@ def prepare_node_data(ent_df, art_df, max_entities, base_dir=None):
                 chunks = [[dim] for dim in data_shape]
                 structure = {
                     "data_type": {
-                        "endianness": "little",
-                        "kind": "f",
-                        "itemsize": 8,
+                        "endianness": data_dtype.byteorder.replace("=", "little").replace("<", "little").replace(">", "big"),
+                        "kind": data_dtype.kind,
+                        "itemsize": data_dtype.itemsize,
                     },
                     "chunks": chunks,
                     "shape": data_shape,
