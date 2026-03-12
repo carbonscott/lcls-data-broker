@@ -285,7 +285,8 @@ def prepare_node_data(ent_df, art_df, max_entities, base_dir=None):
 
 
 def bulk_register(engine, ent_nodes, art_nodes, art_data_sources,
-                  dataset_key, dataset_metadata):
+                  dataset_key, dataset_metadata,
+                  mimetype="application/x-hdf5", is_directory=0):
     """Bulk insert all data with trigger disable/rebuild.
 
     Args:
@@ -295,6 +296,10 @@ def bulk_register(engine, ent_nodes, art_nodes, art_data_sources,
         art_data_sources: List of data source info for artifacts.
         dataset_key: Key for the dataset container (e.g. "VDP").
         dataset_metadata: Metadata dict for the dataset container.
+        mimetype: MIME type for data sources. Use "application/x-hdf5"
+            for HDF5 files (default) or "application/x-zarr" for Zarr stores.
+        is_directory: Whether assets are directories (1) or files (0).
+            Zarr stores are directories; HDF5 files are not.
     """
 
     start_time = time.time()
@@ -410,9 +415,9 @@ def bulk_register(engine, ent_nodes, art_nodes, art_data_sources,
                 result = conn.execute(
                     text("""
                         INSERT OR IGNORE INTO assets (data_uri, is_directory)
-                        VALUES (:data_uri, 0)
+                        VALUES (:data_uri, :is_directory)
                     """),
-                    {"data_uri": data_uri}
+                    {"data_uri": data_uri, "is_directory": is_directory}
                 )
                 # Get the ID (either from insert or existing)
                 existing = conn.execute(
@@ -436,7 +441,7 @@ def bulk_register(engine, ent_nodes, art_nodes, art_data_sources,
                 {
                     "node_id": node_id,
                     "structure_id": ds["structure_id"],
-                    "mimetype": "application/x-hdf5",
+                    "mimetype": mimetype,
                     "parameters": json.dumps(ds["parameters"]),
                     "properties": json.dumps({}),
                     "management": "external",

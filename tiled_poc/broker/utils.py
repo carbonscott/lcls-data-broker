@@ -32,15 +32,21 @@ def to_json_safe(value):
 
 
 def get_artifact_shape(base_dir, file_path, dataset_path, index=None, _cache={}):
-    """Read artifact shape from HDF5, with caching by dataset path.
+    """Read artifact shape from HDF5 or Zarr, with caching by dataset path.
 
     Caches by dataset_path to avoid re-opening files for artifacts
-    that share the same HDF5 internal structure.
+    that share the same internal structure. Tries HDF5 first, falls
+    back to Zarr if that fails.
     """
     if dataset_path not in _cache:
         full_path = os.path.join(base_dir, file_path)
-        with h5py.File(full_path, "r") as f:
-            _cache[dataset_path] = f[dataset_path].shape
+        try:
+            with h5py.File(full_path, "r") as f:
+                _cache[dataset_path] = f[dataset_path].shape
+        except Exception:
+            import zarr
+            store = zarr.open(full_path, mode="r")
+            _cache[dataset_path] = store[dataset_path].shape
     full_shape = _cache[dataset_path]
     if index is not None:
         return list(full_shape[1:])  # Skip batch dimension
