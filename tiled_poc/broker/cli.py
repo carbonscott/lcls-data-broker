@@ -39,6 +39,10 @@ def ingest_main():
     """
     parser = argparse.ArgumentParser(description="Ingest datasets from config files.")
     parser.add_argument("configs", nargs="+", help="Dataset config YAML files")
+    parser.add_argument("--mimetype", default="application/x-hdf5",
+                        help="MIME type for data sources (default: application/x-hdf5)")
+    parser.add_argument("--is-directory", action="store_true", default=False,
+                        help="Assets are directories (e.g. Zarr stores)")
     args = parser.parse_args()
 
     import pandas as pd
@@ -88,7 +92,9 @@ def ingest_main():
         dataset_metadata = config.get("metadata", {"label": label})
         register_dataset(engine, ent_df, art_df, base_dir, label,
                          dataset_key=dataset_key,
-                         dataset_metadata=dataset_metadata)
+                         dataset_metadata=dataset_metadata,
+                         mimetype=args.mimetype,
+                         is_directory=1 if args.is_directory else 0)
 
     # Verify
     from broker.bulk_register import verify_registration
@@ -175,6 +181,10 @@ def register_main():
         metavar="NUM",
         help="Limit number of entities per dataset (default: all)",
     )
+    parser.add_argument("--mimetype", default="application/x-hdf5",
+                        help="MIME type for data sources (default: application/x-hdf5)")
+    parser.add_argument("--is-directory", action="store_true", default=False,
+                        help="Assets are directories (e.g. Zarr stores)")
     args = parser.parse_args()
 
     import pandas as pd
@@ -238,7 +248,9 @@ def register_main():
         dataset_metadata = config.get("metadata", {"label": label})
         register_dataset_http(client, ent_df, art_df, base_dir, label,
                               dataset_key=dataset_key,
-                              dataset_metadata=dataset_metadata)
+                              dataset_metadata=dataset_metadata,
+                              mimetype=args.mimetype,
+                              is_directory=args.is_directory)
 
     # Verify
     verify_registration_http(client)

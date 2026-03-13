@@ -31,14 +31,17 @@ from .utils import (
 )
 
 
-def create_data_source(art_row, base_dir):
-    """Create a Tiled DataSource for an artifact pointing to external HDF5.
+def create_data_source(art_row, base_dir,
+                       mimetype="application/x-hdf5", is_directory=False):
+    """Create a Tiled DataSource for an artifact pointing to external data.
 
-    Reads dataset path and shape from the manifest and HDF5 file directly.
+    Reads dataset path and shape from the manifest and data file directly.
 
     Args:
         art_row: DataFrame row with artifact manifest columns.
         base_dir: Base directory for resolving relative file paths.
+        mimetype: MIME type for the data source (default: application/x-hdf5).
+        is_directory: Whether the asset is a directory (e.g. Zarr store).
 
     Returns:
         Tuple of (DataSource, data_shape, data_dtype).
@@ -60,10 +63,10 @@ def create_data_source(art_row, base_dir):
     data_shape = get_artifact_shape(base_dir, h5_rel_path, dataset_path, index)
     data_dtype = np.float64
 
-    # Create asset pointing to HDF5 file
+    # Create asset pointing to data file/directory
     asset = Asset(
         data_uri=f"file://localhost{h5_full_path}",
-        is_directory=False,
+        is_directory=is_directory,
         parameter="data_uris",
     )
 
@@ -79,7 +82,7 @@ def create_data_source(art_row, base_dir):
 
     # Create data source
     data_source = DataSource(
-        mimetype="application/x-hdf5",
+        mimetype=mimetype,
         assets=[asset],
         structure_family=StructureFamily.array,
         structure=structure,
@@ -91,7 +94,8 @@ def create_data_source(art_row, base_dir):
 
 
 def register_dataset_http(client, ent_df, art_df, base_dir, label,
-                          dataset_key, dataset_metadata):
+                          dataset_key, dataset_metadata,
+                          mimetype="application/x-hdf5", is_directory=False):
     """Register one dataset via HTTP through a running Tiled server.
 
     Creates a dataset container, then entity containers with locator
@@ -105,6 +109,8 @@ def register_dataset_http(client, ent_df, art_df, base_dir, label,
         label: Dataset name (for logging).
         dataset_key: Key for the dataset container (e.g. "VDP").
         dataset_metadata: Metadata dict for the dataset container.
+        mimetype: MIME type for data sources (default: application/x-hdf5).
+        is_directory: Whether assets are directories (e.g. Zarr stores).
 
     Returns:
         bool: True if any entities were registered.
@@ -177,7 +183,8 @@ def register_dataset_http(client, ent_df, art_df, base_dir, label,
 
                     # Create data source pointing to external HDF5
                     data_source, data_shape, data_dtype = create_data_source(
-                        art_row, base_dir=base_dir
+                        art_row, base_dir=base_dir,
+                        mimetype=mimetype, is_directory=is_directory,
                     )
 
                     # Build artifact metadata dynamically from non-standard columns
