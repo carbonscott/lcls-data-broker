@@ -7,20 +7,19 @@ trees:
   - path: /
     tree: catalog
     args:
-      uri: "sqlite:////sdf/data/lcls/ds/prj/prjmaiqmag01/results/cwang31/proj-vdp/tiled_poc/catalog-bulk.db"
+      uri: "sqlite:///catalog.db"  # Path to catalog database
       init_if_not_exists: true
-      writable_storage: "/sdf/data/lcls/ds/prj/prjmaiqmag01/results/cwang31/proj-vdp/tiled_poc/storage"
-      readable_storage:
-        - "/sdf/data/lcls/ds/prj/prjmaiqmag01/results/vdp/data/schema_v1"
+      writable_storage: "storage"
+      readable_storage: []  # Add base_dir paths for your datasets here
 
 # Broker configuration (dataset-agnostic)
 broker:
   # Service directory (where catalog.db and storage/ live)
-  service_dir: "/sdf/data/lcls/ds/prj/prjmaiqmag01/results/cwang31/proj-vdp/tiled_poc"
+  service_dir: "."
 
-  # Data directory root
-  data_dir: "/sdf/data/lcls/ds/prj/prjmaiqmag01/results/vdp"
-  schema_version: "schema_v1"
+  # Data directory root (set to your data location)
+  data_dir: "."
+  schema_version: "data"
 
   # Registration defaults (override with MAX_ENTITIES env var)
   max_entities: 10
