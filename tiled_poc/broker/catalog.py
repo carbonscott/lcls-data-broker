@@ -52,7 +52,7 @@ def register_dataset(engine, ent_df, art_df, base_dir, label,
         art_df: Artifact manifest DataFrame.
         base_dir: Base directory for resolving relative file paths.
         label: Dataset name (for logging).
-        dataset_key: Key for the dataset container (e.g. "VDP").
+        dataset_key: Key for the dataset container.
         dataset_metadata: Metadata dict for the dataset container.
         mimetype: MIME type for data sources (default: application/x-hdf5).
         is_directory: Whether assets are directories (1) or files (0).

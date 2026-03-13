@@ -23,7 +23,7 @@ def load_config(config_path=None):
         config_path: Path to config.yml. Defaults to config.yml in parent directory.
 
     Returns:
-        dict: The 'broker' section of the config file (falls back to 'vdp' for compat).
+        dict: The 'broker' section of the config file.
     """
     if config_path is None:
         config_path = Path(__file__).parent.parent / "config.yml"
@@ -32,8 +32,7 @@ def load_config(config_path=None):
     with open(config_path) as f:
         full_config = yaml.load(f)
 
-    # Prefer 'broker' section, fall back to 'vdp' for backward compatibility
-    return full_config.get("broker", full_config.get("vdp", {}))
+    return full_config.get("broker", {})
 
 
 def get_config():

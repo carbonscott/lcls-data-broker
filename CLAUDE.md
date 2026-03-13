@@ -34,8 +34,7 @@ lcls-data-broker/
         ├── utils.py       # Shared helpers (JSON safe, shape/dtype cache)
         ├── bulk_register.py   # SQLAlchemy bulk registration
         ├── http_register.py   # HTTP registration via Tiled client
-        ├── catalog.py     # Catalog creation + dataset containers
-        └── query_manifest.py  # Mode A discovery API
+        └── catalog.py     # Catalog creation + dataset containers
 ```
 
 ## How to Run

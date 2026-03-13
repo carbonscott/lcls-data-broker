@@ -5,8 +5,8 @@ Generic ingest CLI (thin wrapper).
 See broker.cli.ingest_main for the full implementation.
 
 Usage:
-    python ingest.py datasets/vdp.yml
-    python ingest.py datasets/vdp.yml datasets/edrixs.yml
+    python ingest.py datasets/my_experiment.yml
+    python ingest.py datasets/run001.yml datasets/run002.yml
 """
 from broker.cli import ingest_main
 

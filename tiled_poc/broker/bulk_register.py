@@ -298,7 +298,7 @@ def bulk_register(engine, ent_nodes, art_nodes, art_data_sources,
         ent_nodes: List of entity node dicts.
         art_nodes: List of artifact node dicts.
         art_data_sources: List of data source info for artifacts.
-        dataset_key: Key for the dataset container (e.g. "VDP").
+        dataset_key: Key for the dataset container.
         dataset_metadata: Metadata dict for the dataset container.
         mimetype: MIME type for data sources. Use "application/x-hdf5"
             for HDF5 files (default) or "application/x-zarr" for Zarr stores.
