@@ -21,20 +21,19 @@ parameter names, artifact types, or file layouts are hardcoded.
 
 ## Workflow Overview
 
-The three CLI scripts form a pipeline:
+Manifests are generated externally (by data providers) and fed into the broker:
 
 ```
-generate.py          ingest.py             tiled serve
-  (manifests)   --->   (catalog.db)   --->   (HTTP API)
-                       [offline bulk]        [serve queries]
+Parquet manifests    ingest.py             tiled serve
+  (from provider) --->  (catalog.db)   --->   (HTTP API)
+                        [offline bulk]        [serve queries]
 
-                     register.py
-                       [online HTTP]  --->   (running server)
+                      register.py
+                        [online HTTP]  --->   (running server)
 ```
 
 | Script | Purpose | Server needed? |
 |--------|---------|----------------|
-| `generate.py` | Scan data files, produce Parquet manifests | No |
 | `ingest.py` | Bulk-load manifests into `catalog.db` (SQLAlchemy) | No |
 | `register.py` | Register manifests into a running server (HTTP) | Yes |
 

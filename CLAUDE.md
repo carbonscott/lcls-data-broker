@@ -25,7 +25,6 @@ lcls-data-broker/
 └── tiled_poc/             # Main implementation
     ├── config.yml         # Server configuration (port 8005)
     ├── pyproject.toml     # Package metadata
-    ├── generate.py        # CLI: generate Parquet manifests
     ├── ingest.py          # CLI: bulk ingest into catalog.db
     ├── register.py        # CLI: HTTP register into running server
     └── broker/            # Core library
