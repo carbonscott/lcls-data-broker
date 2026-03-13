@@ -14,6 +14,9 @@ dependencies = [
     "zarr",
 ]
 
+[project.optional-dependencies]
+test = ["pytest"]
+
 [project.scripts]
 broker-ingest = "broker.cli:ingest_main"
 broker-register = "broker.cli:register_main"
